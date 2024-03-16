@@ -20,7 +20,7 @@ def get_input() -> Tuple[str, str, str, str, str, str, str, Optional[str], str, 
     section_dir = input("Section directory: ").strip()
     module_name = input("Module name: ").strip()
     module_number = input("Module number: ").strip()
-    media_prepend = input("Media prepend: ").strip()
+    media_prefix = input("Media prefix: ").strip()
     target_selector = input("Target element or ID: ").strip()
     target_type = input("Is this an element type or an ID? [element/id]: ").strip().lower()
     notes_element = input("Notes element: ").strip()
@@ -31,7 +31,7 @@ def get_input() -> Tuple[str, str, str, str, str, str, str, Optional[str], str, 
         section_dir,
         module_name,
         module_number,
-        media_prepend,
+        media_prefix,
         target_selector,
         target_type,
         notes_element,
@@ -54,7 +54,7 @@ def create_directories(root_dir: str, section_dir: str) -> Tuple[str, str, str]:
 def download_media(
     soup: BeautifulSoup,
     assets_dir: str,
-    media_prepend: str,
+    media_prefix: str,
     module_number: str,
     section_dir: str,
     base_url: str,
@@ -70,7 +70,7 @@ def download_media(
             response = requests.get(src)
 
             ext = src.split(".")[-1].split("?")[0]
-            filename = f"{media_prepend}_{module_number}_{media_counter}.{ext}"
+            filename = f"{media_prefix}_{module_number}_{media_counter}.{ext}"
             filepath = os.path.join(assets_dir, filename)
 
             with open(filepath, "wb") as f:
