@@ -45,13 +45,7 @@ from markdownify import markdownify as md
 import requests
 import os
 from urllib.parse import urlparse
-
-# Custom code demonstrating usage
 ```
-
-## License
-
-This project is under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Media File Naming Convention
 
