@@ -1,0 +1,5 @@
+python-dotenv
+ruff
+requests
+beautifulsoup4
+markdownify
