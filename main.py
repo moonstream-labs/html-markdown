@@ -2,23 +2,38 @@ import os
 import sys
 import requests
 from bs4 import BeautifulSoup
-from markdownify import markdownify as md
+from markdownify import MarkdownConverter as md
 from typing import Tuple, Optional
 from urllib.parse import urlparse
 
+from markdownify import MarkdownConverter as md
 
 class CustomMarkdownConverter(md):
     def convert_code(self, el, text, convert_as_inline):
-        # Check for a parent element that is a 'pre' tag for block code
+        # Existing code conversion logic remains unchanged
         if not convert_as_inline:
-            language = (
-                el.get("class")[0].replace("language-", "") if el.get("class") else None
-            )
-            code_block = (
-                f"```{language}\n{text}\n```" if language else f"```\n{text}\n```"
-            )
+            language = el.get('class')[0].replace('language-', '') if el.get('class') else None
+            code_block = f'```{language}\n{text}\n```' if language else f'```\n{text}\n```'
             return code_block
-        return f"`{text}`"
+        return f'`{text}`'
+    
+    def convert_h1(self, el, text):
+        return '\n\n---\n\n# ' + text.strip() + '\n\n'
+
+    def convert_h2(self, el, text):
+        return '\n\n---\n\n## ' + text.strip() + '\n\n'
+
+    def convert_h3(self, el, text):
+        return '\n\n---\n\n### ' + text.strip() + '\n\n'
+
+    def convert_h4(self, el, text):
+        return '\n\n---\n\n#### ' + text.strip() + '\n\n'
+
+    def convert_h5(self, el, text):
+        return '\n\n---\n\n##### ' + text.strip() + '\n\n'
+
+    def convert_h6(self, el, text):
+        return '\n\n---\n\n###### ' + text.strip() + '\n\n'
 
 
 def get_input() -> Tuple[str, str, str, str, str, str, str, Optional[str], str]:
