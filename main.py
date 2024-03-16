@@ -6,14 +6,20 @@ from markdownify import markdownify as md
 from typing import Tuple, Optional
 from urllib.parse import urlparse
 
+
 class CustomMarkdownConverter(md):
     def convert_code(self, el, text, convert_as_inline):
         # Check for a parent element that is a 'pre' tag for block code
         if not convert_as_inline:
-            language = el.get('class')[0].replace('language-', '') if el.get('class') else None
-            code_block = f'```{language}\n{text}\n```' if language else f'```\n{text}\n```'
+            language = (
+                el.get("class")[0].replace("language-", "") if el.get("class") else None
+            )
+            code_block = (
+                f"```{language}\n{text}\n```" if language else f"```\n{text}\n```"
+            )
             return code_block
-        return f'`{text}`'
+        return f"`{text}`"
+
 
 def get_input() -> Tuple[str, str, str, str, str, str, str, Optional[str], str]:
     """
@@ -50,6 +56,7 @@ def get_input() -> Tuple[str, str, str, str, str, str, str, Optional[str], str]:
         notes_class or None,
     )
 
+
 def create_directories(root_dir: str, section_dir: str) -> Tuple[str, str, str]:
     """
     Creates necessary directories for the repository and assets based on the provided names.
@@ -72,10 +79,17 @@ def create_directories(root_dir: str, section_dir: str) -> Tuple[str, str, str]:
     return root_dir, section_dir, assets_dir
 
 
-def download_media(soup: BeautifulSoup, assets_dir: str, media_prepend: str, module_number: str, section_dir: str, base_url: str) -> None:
+def download_media(
+    soup: BeautifulSoup,
+    assets_dir: str,
+    media_prepend: str,
+    module_number: str,
+    section_dir: str,
+    base_url: str,
+) -> None:
     """
     Downloads media (images, videos, audio) from the HTML content and saves them in the specified assets directory.
-    
+
     Args:
         soup: BeautifulSoup object containing the parsed HTML.
         assets_dir: The directory where media files should be saved.
@@ -85,50 +99,53 @@ def download_media(soup: BeautifulSoup, assets_dir: str, media_prepend: str, mod
         base_url: The base URL of the page to resolve relative media sources.
     """
     media_counter = 1
-    media_tags = soup.find_all(['img', 'video', 'audio'])
-    
+    media_tags = soup.find_all(["img", "video", "audio"])
+
     for tag in media_tags:
         # For video and audio tags, prioritize the source tag if present
-        src = tag.get('src') or (tag.find('source').get('src') if tag.find('source') else None)
+        src = tag.get("src") or (
+            tag.find("source").get("src") if tag.find("source") else None
+        )
         if src:
-            if not src.startswith(('http:', 'https:')):
+            if not src.startswith(("http:", "https:")):
                 src = base_url + src
             response = requests.get(src)
-    
-            ext = src.split(".")[-1].split('?')[0]  # Remove URL parameters
+
+            ext = src.split(".")[-1].split("?")[0]  # Remove URL parameters
             filename = f"{media_prepend}_{module_number}_{media_counter}.{ext}"
             filepath = os.path.join(assets_dir, filename)
-    
+
             with open(filepath, "wb") as f:
                 f.write(response.content)
-    
+
             # Update the src to the Markdown link format
             new_src = f"![[{filename}]]"
-            if tag.name == 'img':
-                tag['src'] = new_src
+            if tag.name == "img":
+                tag["src"] = new_src
             else:
                 # For video and audio, update the source tag's src
-                if tag.find('source'):
-                    tag.find('source')['src'] = new_src
+                if tag.find("source"):
+                    tag.find("source")["src"] = new_src
                 else:
-                    tag['src'] = new_src
-    
+                    tag["src"] = new_src
+
             media_counter += 1
 
 
-
-def clean_html(soup: BeautifulSoup, notes_element: str, notes_class: Optional[str]) -> None:
+def clean_html(
+    soup: BeautifulSoup, notes_element: str, notes_class: Optional[str]
+) -> None:
     """
     Cleans the HTML content by removing unwanted elements and converting notes to a standard format.
 
     Args:
         soup: BeautifulSoup object containing the parsed HTML.
-        code_block_class: The class name for code block elements.
         notes_element: The HTML element type for notes.
         notes_class: The class name for notes elements (optional).
     """
+    # Iterate over all <a> tags and replace them with their text content
     for tag in soup.find_all("a"):
-        tag.decompose()
+        tag.replace_with(tag.get_text())
 
     if notes_class:
         notes = soup.find_all(notes_element, class_=notes_class)
@@ -137,6 +154,7 @@ def clean_html(soup: BeautifulSoup, notes_element: str, notes_class: Optional[st
 
     for note in notes:
         note.name = "blockquote"
+
 
 def convert_to_markdown(html_string: str, section_dir: str, module_name: str) -> None:
     """
@@ -150,6 +168,7 @@ def convert_to_markdown(html_string: str, section_dir: str, module_name: str) ->
     md_filepath = os.path.join(section_dir, f"{module_name}.md")
     with open(md_filepath, "w") as f:
         f.write(md_string)
+
 
 def main() -> None:
     inputs = get_input()
@@ -165,7 +184,9 @@ def main() -> None:
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
 
-    target_div = soup.find("div", id=inputs[5])  # Note: Adjusted index for target_div_id based on corrected get_input order
+    target_div = soup.find(
+        "div", id=inputs[5]
+    )  # Note: Adjusted index for target_div_id based on corrected get_input order
     if not target_div:
         print("Target div not found.")
         sys.exit(1)
@@ -175,6 +196,7 @@ def main() -> None:
     clean_html(target_div, inputs[6], inputs[7], inputs[8])
 
     convert_to_markdown(str(target_div), section_dir, inputs[2])
+
 
 if __name__ == "__main__":
     main()
