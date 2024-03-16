@@ -6,8 +6,6 @@ from markdownify import MarkdownConverter as md
 from typing import Tuple, Optional
 from urllib.parse import urlparse
 
-from markdownify import MarkdownConverter as md
-
 class CustomMarkdownConverter(md):
     def convert_code(self, el, text, convert_as_inline):
         # Existing code conversion logic remains unchanged
