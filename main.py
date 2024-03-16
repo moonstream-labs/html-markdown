@@ -27,7 +27,6 @@ def get_input() -> Tuple[str, str, str, str, str, str, str, Optional[str], str]:
         - module_number: The module number, used in constructing image file titles.
         - media_prepend: Prefix for image file titles.
         - target_div_id: ID of the target div to be converted.
-        - code_block_class: Class name for code block elements in the HTML.
         - notes_element: HTML element type for notes elements.
         - notes_class: Class name for notes elements (optional).
     """
@@ -37,7 +36,6 @@ def get_input() -> Tuple[str, str, str, str, str, str, str, Optional[str], str]:
     module_number = input("Module number: ").strip()
     media_prepend = input("Media prepend: ").strip()
     target_div_id = input("Target div ID: ").strip()
-    code_block_class = input("Code block class: ").strip()
     notes_element = input("Notes element: ").strip()
     notes_class = input("Notes class (leave blank if none): ").strip()
 
@@ -48,7 +46,6 @@ def get_input() -> Tuple[str, str, str, str, str, str, str, Optional[str], str]:
         module_number,
         media_prepend,
         target_div_id,
-        code_block_class,
         notes_element,
         notes_class or None,
     )
@@ -120,7 +117,7 @@ def download_media(soup: BeautifulSoup, assets_dir: str, media_prepend: str, mod
 
 
 
-def clean_html(soup: BeautifulSoup, code_block_class: str, notes_element: str, notes_class: Optional[str]) -> None:
+def clean_html(soup: BeautifulSoup, notes_element: str, notes_class: Optional[str]) -> None:
     """
     Cleans the HTML content by removing unwanted elements and converting notes to a standard format.
 
