@@ -6,11 +6,16 @@ from markdownify import MarkdownConverter as md
 from typing import Tuple, Optional
 from urllib.parse import urlparse
 
+
 class CustomMarkdownConverter(md):
     def convert_code(self, el, text, convert_as_inline):
         if not convert_as_inline:
-            language = el.get("class")[0].replace("language-", "") if el.get("class") else None
-            code_block = f"```{language}\n{text}\n```" if language else f"```\n{text}\n```"
+            language = (
+                el.get("class")[0].replace("language-", "") if el.get("class") else None
+            )
+            code_block = (
+                f"```{language}\n{text}\n```" if language else f"```\n{text}\n```"
+            )
             return code_block
         return f"`{text}`"
 
@@ -22,7 +27,9 @@ def get_input() -> Tuple[str, str, str, str, str, str, str, Optional[str], str, 
     module_number = input("Module number: ").strip()
     media_prefix = input("Media prefix: ").strip()
     target_selector = input("Target element or ID: ").strip()
-    target_type = input("Is this an element type or an ID? [element/id]: ").strip().lower()
+    target_type = (
+        input("Is this an element type or an ID? [element/id]: ").strip().lower()
+    )
     notes_element = input("Notes element: ").strip()
     notes_class = input("Notes class (leave blank if none): ").strip()
 
@@ -63,7 +70,9 @@ def download_media(
     media_tags = soup.find_all(["img", "video", "audio"])
 
     for tag in media_tags:
-        src = tag.get("src") or (tag.find("source").get("src") if tag.find("source") else None)
+        src = tag.get("src") or (
+            tag.find("source").get("src") if tag.find("source") else None
+        )
         if src:
             if not src.startswith(("http:", "https:")):
                 src = base_url + src
@@ -88,9 +97,7 @@ def download_media(
             media_counter += 1
 
 
-def clean_html(
-    soup: BeautifulSoup, notes_element: str, notes_class: Optional[str]
-):
+def clean_html(soup: BeautifulSoup, notes_element: str, notes_class: Optional[str]):
     for tag in soup.find_all("a"):
         tag.replace_with(tag.get_text())
 
