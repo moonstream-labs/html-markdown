@@ -7,19 +7,24 @@ import os
 def convert_html_to_md(html_content):
     # Parse HTML using BeautifulSoup
     soup = BeautifulSoup(html_content, "html.parser")
-
+    
     # Remove <figure> elements
     for figure in soup.find_all("figure"):
         figure.extract()
-
+    
+    # Remove <style> tags to exclude CSS
+    for style_tag in soup.find_all("style"):
+        style_tag.extract()
+    
     # Convert <a> elements to plaintext
     for a_tag in soup.find_all("a"):
         a_tag.string = a_tag.get_text()
-
+    
     # Convert HTML to Markdown using markdownify
     md_content = markdownify(str(soup), heading_style="ATX")
 
     return md_content
+
 
 
 # Function to process HTML files in a directory and save Markdown files to the output directory
@@ -49,7 +54,7 @@ def process_html_files_in_directory(input_directory, output_directory):
             print(f"Conversion complete. Markdown file saved to: {output_md_file}")
 
 
-# Example usage:
-input_directory_path = "/path/to/your/input/directory"
-output_directory_path = "/path/to/your/output/directory"
+# Prompt the user for the input and output directory paths
+input_directory_path = input("Enter the path to your input directory: ")
+output_directory_path = input("Enter the path to your output directory: ")
 process_html_files_in_directory(input_directory_path, output_directory_path)
